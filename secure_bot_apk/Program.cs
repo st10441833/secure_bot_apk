@@ -16,11 +16,14 @@ namespace secure_bot_apk
             DisplayLogo();
 
             // Play the greeting audio
-            PlayGreeting();
+            if (!PlayGreeting())
+            {
+                Console.WriteLine("Skipping greeting due to missing or unreadable file.");
+            }
 
             // Ask the user for their name
             Console.Write("Please enter your name: ");
-            string userName = Console.ReadLine();
+            string userName = Console.ReadLine()?.Trim() ?? "User";
 
             // Display a personalized welcome message
             DisplayWelcomeMessage(userName);
@@ -44,35 +47,42 @@ namespace secure_bot_apk
 ▐░░░░░░░░░░░▌▐░░░░░░░░░░░▌▐░░░░░░░░░░░▌▐░░░░░░░░░░░▌▐░▌       ▐░▌▐░░░░░░░░░░░▌     ▐░░░░░░░░░░▌ ▐░░░░░░░░░░░▌     ▐░▌     
  ▀▀▀▀▀▀▀▀▀▀▀  ▀▀▀▀▀▀▀▀▀▀▀  ▀▀▀▀▀▀▀▀▀▀▀  ▀▀▀▀▀▀▀▀▀▀▀  ▀         ▀  ▀▀▀▀▀▀▀▀▀▀▀       ▀▀▀▀▀▀▀▀▀▀   ▀▀▀▀▀▀▀▀▀▀▀       ▀      
                                                                                
-            ";
-
-            Console.ForegroundColor = ConsoleColor.Cyan; // Set logo color
+            "; // Keep the ASCII logo unchanged
+            Console.ForegroundColor = ConsoleColor.Cyan;
             Console.WriteLine(logo);
             Console.ResetColor();
         }
 
-        static void PlayGreeting()
+        static bool PlayGreeting()
         {
             try
             {
-                // Get absolute path
-                string filePath = @"C:\\Users\\mudau\\source\\repos\\ChatBot\\ChatBot\\audio\";
+                string filePath = @"C:\Users\mudau\source\repos\secure_bot_apk\secure_bot_apk\bin\Debug\greetings.wav.wav";
 
-                SoundPlayer player = new SoundPlayer(filePath);
-                
-                    player.PlaySync(); // Use Play() for non-blocking playback
+                if (!File.Exists(filePath))
+                {
+                    Console.WriteLine("Error: Audio file not found at " + filePath);
+                    return false;
+                }
+
+                using (SoundPlayer player = new SoundPlayer(filePath))
+                {
+                    player.PlaySync(); // Ensures the sound plays before continuing
+                }
+                return true;
             }
             catch (Exception ex)
             {
                 Console.WriteLine("Error playing greeting: " + ex.Message);
+                return false;
             }
         }
 
         static void DisplayWelcomeMessage(string userName)
         {
-            string border = new string('=', 50);  // Decorative border
+            string border = new string('=', 50);
             Console.WriteLine(border);
-            Console.ForegroundColor = ConsoleColor.Green; // Set welcome message color
+            Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine($"Welcome, {userName}, to the Cybersecurity Awareness Bot!");
             Console.WriteLine("I'm here to help you stay safe online.");
             Console.ResetColor();
@@ -85,7 +95,7 @@ namespace secure_bot_apk
             while (true)
             {
                 Console.Write("You: ");
-                string userInput = Console.ReadLine()?.ToLower();
+                string userInput = Console.ReadLine()?.Trim().ToLower();
 
                 if (string.IsNullOrWhiteSpace(userInput))
                 {
@@ -105,7 +115,7 @@ namespace secure_bot_apk
 
         static void RespondToUser(string question)
         {
-            Console.ForegroundColor = ConsoleColor.Yellow; // Set response color
+            Console.ForegroundColor = ConsoleColor.Yellow;
             switch (question)
             {
                 case "how are you?":
@@ -138,9 +148,9 @@ namespace secure_bot_apk
             foreach (char letter in message)
             {
                 Console.Write(letter);
-                System.Threading.Thread.Sleep(50); // Simulate typing delay
+                System.Threading.Thread.Sleep(50);
             }
-            Console.WriteLine(); // Move to the next line after message
+            Console.WriteLine();
         }
     }
 }
